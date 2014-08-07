@@ -69,19 +69,27 @@
     window.onload = null;
 
     function launchTest() {
-    require([
-      <% scripts.src.forEach(function(script, i){ %>
-        <% script = script.replace(/\\/g, '/') // replace all backward slashes to forward slash %>
-        '<%= script %>' <%= i < scripts.src.length-1 ? ',' : '' %>
-      <% }) %>
-    ],
-    function(){
-      require(['<%= [].concat(scripts.specs,scripts.reporters).join("','") %>'], function(){
-        startTests();
+      // loads jquery, a dependency for jasmine plugins
+      require([
+        'jquery'
+      ], function ($) {
+        // loads mockjax and jasmine-jquery plugins
+        require([
+          './client/common/test/jasmine/lib/jquery.mockjax.js',
+          './client/common/test/jasmine/lib/jasmine-jquery.js'
+        ], function () {
+          // loads bootstrap code (setup.js) to get ready for tests
+          require([
+            './client/common/test/jasmine/setup.js'
+          ], function() {
+            // loads the specs
+            require(['<%= [].concat(scripts.specs,scripts.reporters).join("','") %>'], function() {
+              startTests();
+            });
+          });
+        });
       });
     }
-    )
-  }
   </script>
 
   <% if (!hasCallback) { %>
